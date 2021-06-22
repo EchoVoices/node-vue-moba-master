@@ -8,6 +8,6 @@ app.use(express.json())
 require('./routes/admin')(app)
 require('./plugins/db')(app)
 
-app.listen(3000,()=>{
+app.listen(3000, () => {
   console.log('http://localhost:3000');
 })
