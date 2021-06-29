@@ -2,7 +2,7 @@
   <div class="about">
     <h1>{{ id ? '编辑' : '新增' }}分类</h1>
     <el-form ref="form" :model="form" label-width="80px" :rules="rule">
-      <el-row>
+      <!-- <el-row>
         <el-col :span="12">
           <el-form-item label="上级分类" prop="parent">
             <treeselect
@@ -14,13 +14,22 @@
             />
           </el-form-item>
         </el-col>
-      </el-row>
+      </el-row> -->
       <el-row>
         <el-col :span="12">
           <el-form-item label="名称" prop="name">
             <el-input
               v-model="form.name"
-              placeholder="请输入分类名称"
+              placeholder="请输入物品名称"
+            ></el-input> </el-form-item
+        ></el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="图标" prop="icon">
+            <el-input
+              v-model="form.icon"
+              placeholder="请选择图标"
             ></el-input> </el-form-item
         ></el-col>
       </el-row>
@@ -33,50 +42,33 @@
 </template>
 <script>
 // import the component
-import Treeselect from '@riophae/vue-treeselect';
+// import Treeselect from '@riophae/vue-treeselect';
 // import the styles
-import '@riophae/vue-treeselect/dist/vue-treeselect.css';
+// import '@riophae/vue-treeselect/dist/vue-treeselect.css';
 // eslint-disable-next-line no-unused-vars
-import { buildTreeSelect } from '../utils/treeSelect';
+// import { buildTreeSelect } from '../utils/treeSelect';
 export default {
   // register the component
-  components: { Treeselect },
+  // components: { Treeselect },
   props: {
     id: []
   },
   data() {
-    var select = (rule, value, callback) => {
-      console.log(rule)
-      if (value === this.form._id && value) {
-        callback(new Error('上级分类不能是自己'));
-      } else {
-        callback();
-      }
-    };
     return {
-      parents: {},
-      classification: [],
       form: {},
-      normalizer(node) {
-        return {
-          id: node._id,
-          label: node.name,
-          children: node.children
-        };
-      },
+      // normalizer(node) {
+      //   return {
+      //     id: node._id,
+      //     label: node.name,
+      //     children: node.children
+      //   };
+      // },
       // 表单验证规则
       rule: {
         name: [
           {
             required: true,
             message: '名称不能为空',
-            trigger: 'blur'
-          }
-        ],
-        parent: [
-          {
-            required: true,
-            validator: select,
             trigger: 'blur'
           }
         ]
@@ -93,7 +85,6 @@ export default {
   },
   created() {
     this.id && this.fetch();
-    this.fetchParents();
   },
   methods: {
     sumbit() {
@@ -104,13 +95,13 @@ export default {
             if (!this.form.parent) {
               this.form.parent = null;
             }
-            res = await this.$http.put(`rest/categories/${this.id}`, this.form);
+            res = await this.$http.put(`rest/items/${this.id}`, this.form);
           } else {
             this.form._id = undefined;
-            res = await this.$http.post('rest/categories', this.form);
+            res = await this.$http.post('rest/items', this.form);
           }
           if (res) {
-            this.$router.push('/categories/list');
+            this.$router.push('/items/list');
             this.$message({
               type: 'success',
               message: ' 保存成功'
@@ -120,13 +111,8 @@ export default {
       });
     },
     async fetch() {
-      const res = await this.$http.get(`categories/${this.id}`);
+      const res = await this.$http.get(`items/${this.id}`);
       this.form = res.data;
-    },
-    async fetchParents() {
-      this.$http.get('rest/categories').then(res => {
-        this.classification = buildTreeSelect(res.data);
-      });
     }
   }
 };
